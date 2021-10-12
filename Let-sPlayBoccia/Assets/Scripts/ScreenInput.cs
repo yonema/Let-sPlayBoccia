@@ -62,6 +62,7 @@ namespace nsLetsPlayBoccia
             // FPS固定
             Application.targetFrameRate = 30;
 
+
 #if UNITY_EDITOR    // Unityエディター上での操作
             Debug.Log("Unityエディター上での操作");
 #else   // 端末上での操作
@@ -74,11 +75,13 @@ namespace nsLetsPlayBoccia
         void Update()
         {
             GetInputVector();
+
         }
 
         // 入力の取得
         private void GetInputVector()
         {
+
             // タッチ情報を取得して、処理を振り分ける
             switch (MyGodTouch.GetPhase())
             {
@@ -179,6 +182,8 @@ namespace nsLetsPlayBoccia
         // フリック方向の取得
         public FlickDirection GetNowFlick()
         {
+            //Debug.Log(NowFlick);
+
             return NowFlick;
         }
 
