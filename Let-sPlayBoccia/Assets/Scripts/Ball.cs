@@ -57,14 +57,20 @@ namespace nsLetsPlayBoccia
          * @param power 投げる力 
          * @param torque トルク
          */
-        public void Throw(float power, Vector3 torque)
+        public void Throw(float power, Vector3 torque, Vector3 dir)
         {
+            //Vector3 pos = transform.position;
+            //pos.y = 0.3f;
+            //transform.position = pos;
             // 投げる瞬間に重力を適用する
             m_rigibody.useGravity = true;
 
+            Vector3 throwDir = Camera.main.transform.forward + dir;
+            throwDir.Normalize();
+
             // 力を加える
             // Impulse:質量を考慮して、瞬間的に力を与えるモード
-            m_rigibody.AddForce(Camera.main.transform.forward * power, ForceMode.Impulse);
+            m_rigibody.AddForce(dir * power, ForceMode.Impulse);
 
             m_rigibody.AddTorque(torque,ForceMode.VelocityChange);
 

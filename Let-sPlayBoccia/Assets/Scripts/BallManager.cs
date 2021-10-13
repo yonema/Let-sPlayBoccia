@@ -32,7 +32,7 @@ namespace nsLetsPlayBoccia
         Canvas m_canvas;                    //!< キャンバス
 
         //!< デフォルトのボールの生成座標
-        static readonly Vector3 m_kDefaultBallGeneratPos = new Vector3(0.0f, 1.3f, 2.5f);
+        static readonly Vector3 m_kDefaultBallGeneratPos = new Vector3(0.0f, 1.2f, 2.5f);
 
         [SerializeField]
         [Header("SetballGeneratPosition")]
@@ -73,6 +73,8 @@ namespace nsLetsPlayBoccia
 
             // ボールを生成して、セットする
             ballthrower.SetBall(GenerateBallPrefab());
+
+            Camera.main.GetComponent<CameraMove>().Init(screenInput, m_kDefaultBallGeneratPos);
 
             return;
         }
