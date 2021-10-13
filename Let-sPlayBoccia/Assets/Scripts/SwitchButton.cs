@@ -17,29 +17,29 @@ namespace nsLetsPlayBoccia
     {
         [SerializeField]
         [Header("SetUpRotationImage")]
-        Image m_upRotationImage;           //!< 上回転イメージ
+        Image m_upRotationImage;            //!< 上回転イメージ
 
         [SerializeField]
         [Header("SetDownRotationImage")]
-        Image m_downRotationImage;         //!< 下回転イメージ
+        Image m_downRotationImage;          //!< 下回転イメージ
 
         [SerializeField]
         [Header("SetFastBallImage")]
-        Image m_fastBallImage;         //!< 直球イメージ
+        Image m_fastBallImage;              //!< 直球イメージ
 
         [SerializeField]
         [Header("SetArtchingBallImage")]
-        Image m_artchingBallImage;         //!< 山なりイメージ
+        Image m_artchingBallImage;          //!< 山なりイメージ
 
-        BallThrower m_ballThrower;
+        BallThrower m_ballThrower;          //!< ボールを投げるクラス
 
 
         // Start is called before the first frame update
         void Start()
         {
-
             // 最初は上回転モード
             UpRotationMode();
+            // 最初は直球
             FastBallType();
         }
         
@@ -50,9 +50,14 @@ namespace nsLetsPlayBoccia
 
         }
 
+        /**
+         * @brief ボールを投げるクラスを設定する
+         * @param ballThrower ボールを投げるクラス
+         */
         public void SetBallThrower(BallThrower ballThrower)
         {
             m_ballThrower = ballThrower;
+            return;
         }
 
         /**
@@ -76,15 +81,21 @@ namespace nsLetsPlayBoccia
             return;
         }
 
+        /**
+         * @brief 投げ方ボタンに投げ方を設定する
+         * @param throwType 投げ方
+         */
         public void ThrowType(BallThrower.EnThrowType throwType)
         {
             // 直球か？
             if (throwType == BallThrower.EnThrowType.enFastBall)
             {
+                // 直球に変更
                 FastBallType();
             }
             else
             {
+                // 山なりに変更
                 ArchingBallType();
             }
 
@@ -118,6 +129,9 @@ namespace nsLetsPlayBoccia
             return;
         }
 
+        /**
+         * @brief 直球に変更
+         */
         void FastBallType()
         {
             Debug.Log("FastBallType");
@@ -128,6 +142,9 @@ namespace nsLetsPlayBoccia
             return;
         }
 
+        /**
+         * @brief 山なりに変更
+         */
         void ArchingBallType()
         {
             Debug.Log("ArchingBallType");
@@ -164,14 +181,28 @@ namespace nsLetsPlayBoccia
             return;
         }
 
+        /**
+         * @brief 回転ボタンがクリックされたときに呼ばれる処理
+         * @warning この関数の名前を変更した場合、CanvasのUpRotationのEventTriggerコンポーネントの
+         * パラメータを変更しなければいけない。
+         */
         public void OnClickRotationButton()
         {
+            // 回転モードを現在のものから変更する処理
             m_ballThrower.ChangeRotation();
+            return;
         }
 
+        /**
+         * @brief 投げ方ボタンがクリックされたときに呼ばれる処理
+         * @warning この関数の名前を変更した場合、CanvasのFastBallのEventTriggerコンポーネントの
+         * パラメータを変更しなければいけない。
+         */
         public void OnClickThrowTypeButton()
         {
+            // 投げ方を現在のものから変更する
             m_ballThrower.ChangeThorwType();
+            return;
         }
     }
 }

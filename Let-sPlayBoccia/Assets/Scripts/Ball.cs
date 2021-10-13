@@ -48,7 +48,8 @@ namespace nsLetsPlayBoccia
                 pos.y = m_killY;
                 transform.position = pos;
                 // 動かないようにする
-                m_rigibody.isKinematic = true;
+                m_rigibody.useGravity = false;
+                m_rigibody.velocity = Vector3.zero;
             }
         }
 
@@ -56,23 +57,32 @@ namespace nsLetsPlayBoccia
          * @brief 投げる処理
          * @param power 投げる力 
          * @param torque トルク
+         * @param dir 投げる方向
          */
         public void Throw(float power, Vector3 torque, Vector3 dir)
         {
+            // @todo 直球の時の投げる位置が上過ぎるから、投げる位置を下げようかな。
+            // でも、そうするとボール見えなくなるんよね。
             //Vector3 pos = transform.position;
             //pos.y = 0.3f;
             //transform.position = pos;
+
             // 投げる瞬間に重力を適用する
             m_rigibody.useGravity = true;
 
+            // 投げる方向
+            // 現在のカメラの向いている方向と + 直球か山なりの方向
             Vector3 throwDir = Camera.main.transform.forward + dir;
+            // 正規化する
             throwDir.Normalize();
 
             // 力を加える
             // Impulse:質量を考慮して、瞬間的に力を与えるモード
             m_rigibody.AddForce(dir * power, ForceMode.Impulse);
 
-            m_rigibody.AddTorque(torque,ForceMode.VelocityChange);
+            // 回転を加える
+            // Impulse:質量を考慮して、瞬間的に力を与えるモード
+            m_rigibody.AddTorque(torque,ForceMode.Impulse);
 
             return;
         }

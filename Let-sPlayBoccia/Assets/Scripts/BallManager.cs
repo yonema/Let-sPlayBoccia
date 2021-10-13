@@ -74,7 +74,8 @@ namespace nsLetsPlayBoccia
             // ボールを生成して、セットする
             ballthrower.SetBall(GenerateBallPrefab());
 
-            Camera.main.GetComponent<CameraMove>().Init(screenInput, m_kDefaultBallGeneratPos);
+            // メインカメラの初期化処理を行う
+            Camera.main.GetComponent<CameraMove>().Init(m_kDefaultBallGeneratPos);
 
             return;
         }

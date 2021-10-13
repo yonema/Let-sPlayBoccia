@@ -45,4 +45,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MinThorwPower: 0.5
   m_MaxThorwPower: 5
-  m_downTorqueLen: 2500
+  m_downTorqueLen: 0.3
+  m_archingAgle: 45

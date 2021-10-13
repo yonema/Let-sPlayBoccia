@@ -14,44 +14,28 @@ namespace nsLetsPlayBoccia
      */
     public class BallThrower : MonoBehaviour
     {
-
-        //!< デフォルトの投げる強さの最小値
-        static readonly float m_kDefaultMinThrowPower = 0.5f;
         [SerializeField]
         [Header("SetMinThrowPower")]
-        float m_MinThorwPower = m_kDefaultMinThrowPower;  //!< 投げる強さの最小値
+        float m_MinThorwPower = 0.5f;  //!< 投げる強さの最小値
 
-        //!< デフォルトの投げる強さの最大値
-        static readonly float m_kDefaultMaxThrowPower = 5.0f;
         [SerializeField]
         [Header("SetMaxThrowPower")]
-        float m_MaxThorwPower = m_kDefaultMaxThrowPower;  //!< 投げる強さの最小値
+        float m_MaxThorwPower = 5.0f;  //!< 投げる強さの最小値
 
-        //!< デフォルトの下回転のトルクの大きさ
-        static readonly float m_kDefaultDownTorqueLen = 2500.0f;
         [SerializeField]
         [Header("SetDownTorqueLen")]
-        float m_downTorqueLen = m_kDefaultDownTorqueLen;  //!< 下回転のトルクの大きさ
+        float m_downTorqueLen = 2500.0f;  //!< 下回転のトルクの大きさ
 
-        //!< デフォルトの山なりの角度
-        static readonly float m_kDefaultArchingAngle = 45.0f;
         [SerializeField]
         [Header("SetArchingAngle")]
-        float m_archingAgle = m_kDefaultArchingAngle;  //!< 山なりの角度の大きさ
-
-        ////!< デフォルトの山なりの投げる高さ
-        //static readonly float m_kDefaultArchingThrowHeight = 45.0f;
-        //[SerializeField]
-        //[Header("SetArchingThrowHeight")]
-        //float m_archingThrowPos = m_kDefaultArchingThrowHeight;  //!< 山なりの角度の大きさ
-
+        float m_archingAgle = 45.0f;  //!< 山なりの角度の大きさ
 
 
         ScreenInput m_screenInput;  //!< スクリーンの入力情報
         Ball m_ball;                //!< ボール
         BallManager m_ballManager;  //!< ボールマネージャー
         ThrowPowerController m_throwPowerController;    //!< 投げるパワーのコントローラー
-        SwitchButton m_switchButton;
+        SwitchButton m_switchButton;                    //!< ボタン切り替え
 
         bool m_canThrow = false;        //!< 投球可能か？
 
@@ -76,12 +60,15 @@ namespace nsLetsPlayBoccia
         }
         EnBallRotation m_ballRotation = EnBallRotation.enUpRotation;    //!< ボールの回転
 
+        /**
+         * @brief 投げ方
+         */
         public enum EnThrowType
         {
-            enFastBall,
-            enArchingBall
+            enFastBall,     //!< 直球
+            enArchingBall   //!< 山なり
         }
-        EnThrowType m_thorwType = EnThrowType.enFastBall;
+        EnThrowType m_thorwType = EnThrowType.enFastBall;   //!< 投げ方
 
         // Start is called before the first frame update
         void Start()
@@ -127,7 +114,7 @@ namespace nsLetsPlayBoccia
             {
                 // タッチされたら投球可能にする
                 m_canThrow = true;
-                // パワーゲージの増減を開始する
+                // パワーゲージの増減を開始する。
                 m_throwPowerController.StartGauge();
             }
 
@@ -136,39 +123,10 @@ namespace nsLetsPlayBoccia
             {
                 Debug.Log("FlickUp");
 
-                // パワーゲージの増減を止めて、パワー率を得る
-                float powerRate = m_throwPowerController.EndGauge();
+                // 投球する
+                Throw();
 
-                // パワー率から投げるパワーを計算する
-                float power = Mathf.Lerp(m_MinThorwPower, m_MaxThorwPower, powerRate);
-
-                Debug.Log("rate:" + powerRate + "," + "power:" + power);
-
-                // トルク
-                Vector3 torque = Vector3.zero;
-                if (m_ballRotation == EnBallRotation.enDownRotation)
-                {
-                    torque = Vector3.left * m_downTorqueLen;
-                }
-                Debug.Log("torque" + torque);
-
-
-                Vector3 throwDir = Camera.main.transform.forward;
-                throwDir.y = 0.0f;
-                if (m_thorwType == EnThrowType.enArchingBall)
-                {
-                    Vector3 rotAxis = Vector3.Cross(throwDir, Vector3.up);
-                    throwDir = Quaternion.AngleAxis(m_archingAgle, rotAxis) * throwDir;
-                }
-                throwDir.Normalize();
-
-                // 投げる
-                m_ball.Throw(power, torque, throwDir);
-
-                // ボールの静止状態を待つステートへ
-                m_state = EnBallThrowerState.enWaitIsSleeping;
             }
-
 
             // 画面に指が触れていない時
             if (MyGodTouch.GetPhase() == GodPhase.None)
@@ -203,14 +161,62 @@ namespace nsLetsPlayBoccia
                 // 次のターンを待つステートへ
                 m_state = EnBallThrowerState.enWaitNextTurn;
             }
+
+            return;
+        }
+
+        /**
+         * @brief 投球する
+         */
+        void Throw()
+        {
+            // パワーゲージの増減を止めて、パワー率を得る
+            float powerRate = m_throwPowerController.EndGauge();
+
+            // パワー率から投げるパワーを計算する
+            float power = Mathf.Lerp(m_MinThorwPower, m_MaxThorwPower, powerRate);
+
+            Debug.Log("rate:" + powerRate + "," + "power:" + power);
+
+            // トルク
+            Vector3 torque = Vector3.zero;
+            // 下回転か？
+            if (m_ballRotation == EnBallRotation.enDownRotation)
+            {
+                // 下回転のトルクを計算
+                torque = Vector3.Cross(Camera.main.transform.forward, Vector3.up) * m_downTorqueLen;
+            }
+            Debug.Log("torque" + torque);
+
+
+            // 投げる方向
+            Vector3 throwDir = Camera.main.transform.forward;
+            // Y成分をなくしておく
+            throwDir.y = 0.0f;
+            // 山なりか？
+            if (m_thorwType == EnThrowType.enArchingBall)
+            {
+                // 山なりの方向を計算
+                Vector3 rotAxis = Vector3.Cross(throwDir, Vector3.up);
+                throwDir = Quaternion.AngleAxis(m_archingAgle, rotAxis) * throwDir;
+            }
+            // 正規化する
+            throwDir.Normalize();
+
+            // ボールを投げる
+            m_ball.Throw(power, torque, throwDir);
+
+            // ボールの静止状態を待つステートへ
+            m_state = EnBallThrowerState.enWaitIsSleeping;
+
+            return;
         }
 
         /**
          * @brief 初期化
          * @param ballManager ボールのマネージャー
-         * @param スクリーンの入力情報
-         * @param 投げるパワーのコントローラー
-         * @param 回転ボタン切り替え処理
+         * @param screenInput スクリーンの入力情報
+         * @param canvas UIのキャンバス
          */
         public void Init(
             BallManager ballManager,
@@ -233,22 +239,25 @@ namespace nsLetsPlayBoccia
         public void SetBall(Ball ball)
         {
             m_ball = ball;
+
+            return;
         }
 
         /**
-         * @brief 回転ボタンを押したときの処理
-         * @warning この関数の名前を変更した場合、GameMainシーンのRotationButtonのOnClickの
-         * パラメータも変更しなければいけない。
+         * @brief 回転モードを現在のものから変更する処理
          */
         public void ChangeRotation()
         {
+            // 上回転か？
             if (m_ballRotation == EnBallRotation.enUpRotation)
             {
+                // 上回転なら、下回転に変更する
                 m_ballRotation = EnBallRotation.enDownRotation;
 
             }
             else
             {
+                // 下回転なら、上回転に変更する
                 m_ballRotation = EnBallRotation.enUpRotation;
             }
             Debug.Log("ChangeRotation:" + m_ballRotation);
@@ -260,18 +269,25 @@ namespace nsLetsPlayBoccia
             return;
         }
 
+        /**
+         * @brief 投げ方を現在のものから変更する
+         */
         public void ChangeThorwType()
         {
+            // 直球か？
             if (m_thorwType == EnThrowType.enFastBall)
             {
+                // 直球なら、山なりに変更する
                 m_thorwType = EnThrowType.enArchingBall;
             }
             else
             {
+                // 山なりなら、直球に変更する
                 m_thorwType = EnThrowType.enFastBall;
             }
             Debug.Log("ChangeThorwType:" + m_thorwType);
 
+            // 投げ方のボタンを切り替える
             m_switchButton.ThrowType(m_thorwType);
 
             return;
