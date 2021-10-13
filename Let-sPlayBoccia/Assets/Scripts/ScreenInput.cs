@@ -10,7 +10,7 @@ namespace nsLetsPlayBoccia
 
     /**
      * @brief スクリーンの入力情報クラス
-     * @author 米地真央
+     * @author yoneji
      * @details こちらのサイトから引用してきたコードをちょっと改造
      * https://deve-cat.com/unity-flick-swipe/
      * Unityのエディタ上と端末上でタッチの処理を共通化するためにMyGodTouchクラスを使用

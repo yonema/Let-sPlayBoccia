@@ -10,7 +10,7 @@ namespace nsLetsPlayBoccia
 
     /**
      * @brief ボールを投げるクラス
-     * @author 米地真央
+     * @author yoneji
      */
     public class BallThrower : MonoBehaviour
     {
@@ -27,10 +27,19 @@ namespace nsLetsPlayBoccia
         [Header("SetMaxThrowPower")]
         float m_MaxThorwPower = m_kDefaultMaxThrowPower;  //!< 投げる強さの最小値
 
+        //!< デフォルトの下回転のトルクの大きさ
+        static readonly float m_kDefaultDownTorqueLen = 5.0f;
+        [SerializeField]
+        [Header("SetMaxThrowPower")]
+        float m_downTorqueLen = m_kDefaultDownTorqueLen;  //!< 下回転のトルクの大きさ
+
+
+
         ScreenInput m_screenInput;  //!< スクリーンの入力情報
         Ball m_ball;                //!< ボール
         BallManager m_ballManager;  //!< ボールマネージャー
         ThrowPowerController m_throwPowerController;    //!< 投げるパワーのコントローラー
+        SwitchRotationButton m_switchRotationButton;
 
         bool m_canThrow = false;        //!< 投球可能か？
 
@@ -45,6 +54,16 @@ namespace nsLetsPlayBoccia
         }
         EnBallThrowerState m_state = EnBallThrowerState.enBeforeThrow;  //!< ステート
 
+        /**
+         * @brief ボールの回転
+         */
+        public enum EnBallRotation
+        {
+            enUpRotation,   //!< 上回転
+            enDownRotation  //!< 下回転
+        }
+        EnBallRotation m_ballRotation = EnBallRotation.enUpRotation;    //!< ボールの回転
+
         // Start is called before the first frame update
         void Start()
         {
@@ -54,6 +73,7 @@ namespace nsLetsPlayBoccia
         // Update is called once per frame
         void Update()
         {
+
             // ステートで処理を振り分け
             switch (m_state)
             {
@@ -105,8 +125,16 @@ namespace nsLetsPlayBoccia
 
                 Debug.Log("rate:" + powerRate + "," + "power:" + power);
 
+                // トルク
+                Vector3 torque = Vector3.zero;
+                if (m_ballRotation == EnBallRotation.enDownRotation)
+                {
+                    torque = Vector3.left * m_downTorqueLen;
+                }
+
+                Debug.Log("torque" + torque);
                 // 投げる
-                m_ball.Throw(power);
+                m_ball.Throw(power, torque);
 
                 // ボールの静止状態を待つステートへ
                 m_state = EnBallThrowerState.enWaitIsSleeping;
@@ -153,16 +181,19 @@ namespace nsLetsPlayBoccia
          * @param ballManager ボールのマネージャー
          * @param スクリーンの入力情報
          * @param 投げるパワーのコントローラー
+         * @param 回転ボタン切り替え処理
          */
         public void Init(
             BallManager ballManager,
             ScreenInput screenInput,
-            ThrowPowerController throwPowerController
+            Canvas canvas
             )
         {
             m_ballManager = ballManager;
             m_screenInput = screenInput;
-            m_throwPowerController = throwPowerController;
+            m_throwPowerController = canvas.GetComponent<ThrowPowerController>();
+            m_switchRotationButton = canvas.GetComponent<SwitchRotationButton>();
+            m_switchRotationButton.SetBallThrower(this);
             return;
         }
 
@@ -173,6 +204,29 @@ namespace nsLetsPlayBoccia
         public void SetBall(Ball ball)
         {
             m_ball = ball;
+        }
+
+        /**
+         * @brief 回転ボタンを押したときの処理
+         * @warning この関数の名前を変更した場合、GameMainシーンのRotationButtonのOnClickの
+         * パラメータも変更しなければいけない。
+         */
+        public void ChangeRotation()
+        {
+            if (m_ballRotation == EnBallRotation.enUpRotation)
+            {
+                m_ballRotation = EnBallRotation.enDownRotation;
+
+            }
+            else
+            {
+                m_ballRotation = EnBallRotation.enUpRotation;
+            }
+            Debug.Log("ChangeRotation:" + m_ballRotation);
+
+
+            // 回転ボタンを切り替える
+            m_switchRotationButton.RotationMode(m_ballRotation);
         }
 
     }

@@ -11,7 +11,7 @@ namespace nsLetsPlayBoccia
 {
     /**
      * @brief ボールマネージャークラス
-     * @author 米地真央
+     * @author yoneji
      */
     public class BallManager : MonoBehaviour
     {
@@ -37,7 +37,6 @@ namespace nsLetsPlayBoccia
         [SerializeField]
         [Header("SetballGeneratPosition")]
         Vector3 m_ballGeneratPos = m_kDefaultBallGeneratPos;  //!< ボールの生成座標
-
 
 
         // Start is called before the first frame update
@@ -66,7 +65,11 @@ namespace nsLetsPlayBoccia
             ScreenInput screenInput = Instantiate(m_screenInputPrefab).GetComponent<ScreenInput>();
 
             // ボールを投げるプレハブを初期化
-            ballthrower.Init(this, screenInput,m_canvas.GetComponent<ThrowPowerController>());
+            ballthrower.Init(
+                this,
+                screenInput,
+                m_canvas
+                );
 
             // ボールを生成して、セットする
             ballthrower.SetBall(GenerateBallPrefab());

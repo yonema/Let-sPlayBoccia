@@ -7,7 +7,7 @@ namespace nsLetsPlayBoccia
 {
     /**
      * @brief Unityのエディター上と端末上でのタッチ共通化処理
-     * @author 米地真央
+     * @author yoneji
      * @details こちらのサイトから引用してきたコードをちょっと改造
      * https://qiita.com/tempura/items/4a5482ff6247ec8873df
      */
