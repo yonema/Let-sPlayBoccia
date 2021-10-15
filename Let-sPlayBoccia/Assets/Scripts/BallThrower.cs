@@ -200,6 +200,12 @@ namespace nsLetsPlayBoccia
                 Vector3 rotAxis = Vector3.Cross(throwDir, Vector3.up);
                 throwDir = Quaternion.AngleAxis(m_archingAgle, rotAxis) * throwDir;
             }
+            else
+            {
+                // éŒÇﬂâ∫Ç…ìäÇ∞ÇÈåvéZ
+                Vector3 rotAxis = Vector3.Cross(throwDir, Vector3.up);
+                throwDir = Quaternion.AngleAxis(-30.0f, rotAxis) * throwDir;
+            }
             // ê≥ãKâªÇ∑ÇÈ
             throwDir.Normalize();
 

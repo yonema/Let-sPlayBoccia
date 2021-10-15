@@ -753,6 +753,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_maxAngle: 45
+  m_maxWipeVecLen: 1000
 --- !u!1 &1040553180
 GameObject:
   m_ObjectHideFlags: 0

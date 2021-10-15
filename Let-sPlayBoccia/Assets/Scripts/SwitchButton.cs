@@ -162,7 +162,7 @@ namespace nsLetsPlayBoccia
         {
             // イメージの不透明にする
             Color color = image.color;
-            color.a = 1.0f;
+            color.a = 0.5f;
             image.color = color;
 
             return;
